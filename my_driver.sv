@@ -1,5 +1,8 @@
 import uvm_pkg::*;
 import my_test_pkg::*;
+//`include "my_tx.sv"
+`include "uvm_macros.svh"
+typedef class my_tx;
 class my_driver extends uvm_driver #(my_tx);
 	`uvm_component_utils(my_driver)
 
@@ -10,8 +13,9 @@ class my_driver extends uvm_driver #(my_tx);
 	virtual tb_if tb_vif; // virtual interface pointer
 
 	function void build_phase(uvm_phase phase);
-		if (!uvm_config_db #(virtual my_dut_interface)::get(this, "", "DUT_IF", tb_vif))
-		`uvm_fatal("NOVIF", Failed to get virtual interface from uvm_config_db.\n")
+		if (!uvm_config_db #(virtual tb_if)::get(this, "", "DUT_IF", tb_vif))begin
+		`uvm_fatal("NOVIF", "Failed to get virtual interface from uvm_config_db.\n")
+		end
 	endfunction: build_phase
 
 	task run_phase(uvm_phase phase);

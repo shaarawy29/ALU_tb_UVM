@@ -1,8 +1,11 @@
 import uvm_pkg::*;
 import my_test_pkg::*;
+`include "uvm_macros.svh"
+typedef class my_tx;
 //`uvm_analysis_imp_decl(_verify_outputs)
 
 class my_scoreboard extends uvm_subscriber #(my_tx);
+
 	`uvm_component_utils(my_scoreboard)
 
 	function new(string name, uvm_component parent );
@@ -17,8 +20,8 @@ class my_scoreboard extends uvm_subscriber #(my_tx);
 
 	function void build_phase(uvm_phase phase);
 	 //dut_in_imp_export = new("dut_in_imp_export", this);
-    if (!uvm_config_db #(event)::get(this, "", "ok", ok))
-				`uvm_fatal("NO_OK", Failed to get event from uvm_config_db.\n")
+    if (!uvm_config_db #(event)::get(this, "", "ok", ok)) // revisit it in case not triggred
+				`uvm_fatal("NO_OK", "Failed to get event from uvm_config_db.\n")
 	endfunction
 
 	// implement the write() method called by the monitor for observed DUT inputs;
@@ -27,7 +30,7 @@ class my_scoreboard extends uvm_subscriber #(my_tx);
 		function void write (my_tx t);
 			my_tx expected_tx;
 			$cast(expected_tx, t.clone()); // create new my_tx object and preserve input vals
-			case (t.ALU_Sel)
+			case (t.ALU_sel)
 				4'b0000: // Addition
 	     	{expected_tx.Carry_out,expected_tx.ALU_out} = expected_tx.A + expected_tx.B ; 
         4'b0001: // subtraction
@@ -43,7 +46,7 @@ class my_scoreboard extends uvm_subscriber #(my_tx);
 	 			4'b0110: // rotate left
 				{expected_tx.Carry_out,expected_tx.ALU_out} = {expected_tx.A[6:0],expected_tx.A[7]} ; 
 	 			4'b0111: // rotate right
-				{v.Carry_out,v.ALU_out} = {expected_tx.A[0],expected_tx.A[7:1]};
+				{expected_tx.Carry_out,expected_tx.ALU_out} = {expected_tx.A[0],expected_tx.A[7:1]};
         4'b1000: //logical and
        	{expected_tx.Carry_out,expected_tx.ALU_out} = expected_tx.A & expected_tx.B;
         4'b1001://Logical or
@@ -65,13 +68,10 @@ class my_scoreboard extends uvm_subscriber #(my_tx);
 		 // expected_tx.exception = ...
 		//	expected_fifo.put(expected_tx); // save transaction handle
 
-	 	if(expected_tx.ALU_out == t.ALU_out)
-	         begin
+	 	if(expected_tx.ALU_out == t.ALU_out) begin
         	$display("[%t0] scoreboard pass! output match ref_item=0x%0h item=0x%0h",$time,expected_tx.ALU_out,t.ALU_out);
-		   if((expected_tx.ALU_sel == 4'b0000)/*for addition*/ || (expected_tx.ALU_sel == 4'b0010)/*for multiplication*/)
-	      	begin
-			   if(expected_tx.Carry_out == t.Carry_out)
-			      begin
+		   if((expected_tx.ALU_sel == 4'b0000)/*for addition*/ || (expected_tx.ALU_sel == 4'b0010)/*for multiplication*/) begin
+			   if(expected_tx.Carry_out == t.Carry_out) begin
         			$display("[%t0] scoreboard pass! Carry match ref_item=0x%0h item=0x%0h",$time,expected_tx.Carry_out,t.Carry_out);
 				$display("Right Instruction!");
 					num_passed++;
@@ -99,8 +99,6 @@ class my_scoreboard extends uvm_subscriber #(my_tx);
 				if((expected_tx.ALU_out == t.ALU_out) && (t.ALU_sel != 4'h0))begin
 					->ok;
 				end
-       end
-    end
 endfunction: write
 
 	function void report_phase(uvm_phase phase);

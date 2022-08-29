@@ -1,12 +1,16 @@
 import uvm_pkg::*;
 import my_test_pkg::*;
+`include "uvm_macros.svh"
+//`include "my_tx.sv"
 
-class tx_sequence extends uvm_sequence#(my_item);
+typedef class my_tx;
+
+class tx_sequence extends uvm_sequence#(my_tx);
 	`uvm_object_utils(tx_sequence)
 
 	task body();
 		for(int i =0; i < 4;i++) begin
-			tx = my_seq_item::type_id::create("tx");
+		 my_tx tx = my_tx::type_id::create("tx");
 			start_item(tx);
 
 			if(i == 0) begin

@@ -1,5 +1,5 @@
 import uvm_pkg::*;
-import my_test_pkg::*;
+//import my_test_pkg::*;
 class my_tx extends uvm_sequence_item;
 	rand bit [7:0] A;
 	rand bit [7:0] B;
