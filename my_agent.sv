@@ -1,4 +1,6 @@
 
+import uvm_pkg::*;
+import my_test_pkg::*;
 class my_agent extends uvm_agent;
 	`uvm_component_utils(my_agent) // register this class in the factory
 
@@ -27,13 +29,14 @@ class my_agent extends uvm_agent;
 				this.is_active = this.m_config.is_active;
 				this.enable_coverage = this.m_config.enable_coverage;
 			end
-		else `uvm_warning("LAB", Failed to access config_db -- using defaults instead.\n")
-			mon = my_monitor::type_id::create("mon", this);*/
+		else `uvm_warning("LAB", Failed to access config_db -- using defaults instead.\n")*/
+			//mon = my_monitor::type_id::create("mon", this);
 
 		//if (is_active == UVM_ACTIVE) 
 			//begin
 				sqr = my_sequencer::type_id::create("sqr", this);
 				drv = my_driver::type_id::create("drv", this);
+				mon = my_monitor::type_id::create("mon", this);
 			//end
 
 /*if (enable_coverage)

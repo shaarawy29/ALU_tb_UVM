@@ -1,4 +1,5 @@
-
+import uvm_pkg::*;
+import my_test_pkg::*;
 class my_driver extends uvm_driver #(my_tx);
 	`uvm_component_utils(my_driver)
 

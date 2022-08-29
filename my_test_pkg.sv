@@ -1,8 +1,13 @@
-
+import uvm_pkg::*;
 package my_test_pkg;
-`include "test.sv"
+//import uvm_pkg::*;
+//`include "my_test.sv"
 `include "my_env.sv"
 `include "my_driver.sv"
 `include "my_agent.sv"
 `include "my_coverage.sv"
+`include "my_monitor.sv"
+`include "my_scoreboard.sv"
+`include "tx_sequence.sv"
+`include "my_tx.sv"
 endpackage

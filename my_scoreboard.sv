@@ -1,4 +1,5 @@
-
+import uvm_pkg::*;
+import my_test_pkg::*;
 //`uvm_analysis_imp_decl(_verify_outputs)
 
 class my_scoreboard extends uvm_subscriber #(my_tx);
@@ -11,10 +12,13 @@ class my_scoreboard extends uvm_subscriber #(my_tx);
 	//uvm_analysis_imp_verify_outputs #(my_tx, my_scoreboard) dut_out_imp_export;
 	//mailbox #(my_tx) expected_fifo = new; // SystemVerilog mailbox for my_tx handles
 
+	event ok;
 	int num_passed, num_failed; // score cards
 
 	function void build_phase(uvm_phase phase);
 	 //dut_in_imp_export = new("dut_in_imp_export", this);
+    if (!uvm_config_db #(event)::get(this, "", "ok", ok))
+				`uvm_fatal("NO_OK", Failed to get event from uvm_config_db.\n")
 	endfunction
 
 	// implement the write() method called by the monitor for observed DUT inputs;
@@ -58,13 +62,49 @@ class my_scoreboard extends uvm_subscriber #(my_tx);
          {expected_tx.Carry_out,expected_tx.ALU_out} = (expected_tx.A == expected_tx.B)?8'd1:8'd0; 
         default:{expected_tx.Carry_out,expected_tx.ALU_out} = expected_tx.A & expected_tx.B; 
 			endcase
-		expected_tx.exception = ...
-			expected_fifo.put(expected_tx); // save transaction handle
-		endfunction: write
-// implement the write() method called by the monitor for actual DUT outputs;
-// compare the DUT outputs to the predicted results
+		 // expected_tx.exception = ...
+		//	expected_fifo.put(expected_tx); // save transaction handle
 
-function void report_phase(uvm_phase phase);
-...
-endfunction: report_phase
+	 	if(expected_tx.ALU_out == t.ALU_out)
+	         begin
+        	$display("[%t0] scoreboard pass! output match ref_item=0x%0h item=0x%0h",$time,expected_tx.ALU_out,t.ALU_out);
+		   if((expected_tx.ALU_sel == 4'b0000)/*for addition*/ || (expected_tx.ALU_sel == 4'b0010)/*for multiplication*/)
+	      	begin
+			   if(expected_tx.Carry_out == t.Carry_out)
+			      begin
+        			$display("[%t0] scoreboard pass! Carry match ref_item=0x%0h item=0x%0h",$time,expected_tx.Carry_out,t.Carry_out);
+				$display("Right Instruction!");
+					num_passed++;
+       			end
+        		else begin
+         			$display("[%t0] scoreboard Error! Carry mismatch ref_item=0x%0h item=0x%0h",$time,expected_tx.Carry_out,t.Carry_out);
+				$display("Wrong Instruction!");
+					num_failed++;
+        		end  
+		end
+		else begin
+			$display("Right Instruction!");
+			num_passed++;
+		end
+        end
+        else begin
+         	$display("[%t0] scoreboard Error! output mismatch ref_item=0x%0h item=0x%0h",$time,expected_tx.ALU_out,t.ALU_out);
+					$display("Wrong Instruction!");
+					num_failed++;
+        end
+       
+		 		if((expected_tx.ALU_out == t.ALU_out) && (expected_tx.Carry_out == t.Carry_out) && (t.ALU_sel == 4'h0))begin
+					->ok;
+					end
+				if((expected_tx.ALU_out == t.ALU_out) && (t.ALU_sel != 4'h0))begin
+					->ok;
+				end
+       end
+    end
+endfunction: write
+
+	function void report_phase(uvm_phase phase);
+		`uvm_info("Scoreboard:", $sformatf("\n passed=%0d failed=%0d\n",
+		num_passed, num_failed), UVM_NONE)
+	endfunction: report_phase
 endclass: my_scoreboard

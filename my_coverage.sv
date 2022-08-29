@@ -1,4 +1,5 @@
-
+import uvm_pkg::*;
+import my_test_pkg::*;
 class my_coverage extends uvm_subscriber #(my_tx);
 	my_tx tx; // the transaction object on which value changes will be covered
 

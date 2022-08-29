@@ -1,4 +1,5 @@
-
+import uvm_pkg::*;
+import my_test_pkg::*;
 class my_monitor extends uvm_monitor;
 	`uvm_component_utils(my_monitor)
 
@@ -19,10 +20,10 @@ class my_monitor extends uvm_monitor;
 	endfunction: build_phase
 
 	task run_phase(uvm_phase phase);
-		my_tx tx_in, tx_copy;
+		my_tx tx_in;
 		fork
 		// monitor DUT inputs synchronous to the interface clock
-	forever @(posedge tb_vif.clk) begin
+		forever @(posedge tb_vif.clk) begin
 		// create a new tx_write object for this cycle
 		tx_in = my_tx::type_id::create("tx_in");
 		tx_in.A = tb_vif.A;
