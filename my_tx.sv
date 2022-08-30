@@ -1,4 +1,5 @@
 import uvm_pkg::*;
+`include "uvm_macros.svh"
 //import my_test_pkg::*;
 class my_tx extends uvm_sequence_item;
 	rand bit [7:0] A;
@@ -6,6 +7,8 @@ class my_tx extends uvm_sequence_item;
 	bit[3:0] ALU_sel;
 	bit[7:0] ALU_out;
 	bit Carry_out;
+
+	`uvm_object_utils(my_tx)
 
 	function new(string name = "my_tx");
 		super.new(name);

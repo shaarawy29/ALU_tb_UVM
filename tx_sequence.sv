@@ -42,6 +42,7 @@ class tx_sequence extends uvm_sequence#(my_tx);
 
 			finish_item(tx);
 	 end
+#10;
 endtask
 endclass:tx_sequence
 

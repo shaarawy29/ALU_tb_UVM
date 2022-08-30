@@ -15,16 +15,18 @@ class my_env extends uvm_env;
 	my_agent agent;
 	my_scoreboard scoreboard;
 	my_coverage coverage;
+	event ok;
 
 	function void build_phase(uvm_phase phase);
 		agent = my_agent::type_id::create("agent", this);
 		scoreboard = my_scoreboard::type_id::create("scoreboard", this);
 		coverage = my_coverage::type_id::create("covergae", this);
+		uvm_config_db #(event)::set(null, "*", "ok", ok);
 	endfunction: build_phase
 
 	function void connect_phase(uvm_phase phase);
-		agent.dut_inputs_port.connect(scoreboard.dut_in_imp_export);
-		agent.dut_inputs_port.connect(coverage.dut_in_imp_export);
+		agent.dut_inputs_port.connect(scoreboard.analysis_export);
+		agent.dut_inputs_port.connect(coverage.analysis_export);
 		//agent.dut_outputs_port.connect(scoreboard.dut_out_imp_export);
 	endfunction: connect_phase
 
