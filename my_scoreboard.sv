@@ -2,7 +2,6 @@ import uvm_pkg::*;
 import my_test_pkg::*;
 `include "uvm_macros.svh"
 typedef class my_tx;
-//`uvm_analysis_imp_decl(_verify_outputs)
 
 class my_scoreboard extends uvm_subscriber #(my_tx);
 
@@ -12,20 +11,13 @@ class my_scoreboard extends uvm_subscriber #(my_tx);
 		super.new(name, parent);
 	endfunction: new
 
-	//uvm_analysis_imp_verify_outputs #(my_tx, my_scoreboard) dut_out_imp_export;
-	//mailbox #(my_tx) expected_fifo = new; // SystemVerilog mailbox for my_tx handles
-
 	event ok;
 	int num_passed, num_failed; // score cards
 
 	function void build_phase(uvm_phase phase);
-	 //dut_in_imp_export = new("dut_in_imp_export", this);
-    if (!uvm_config_db #(event)::get(this, "", "ok", ok)) // revisit it in case not triggred
+    if (!uvm_config_db #(event)::get(this, "", "ok", ok))
 				`uvm_fatal("NO_OK", "Failed to get event from uvm_config_db.\n")
 	endfunction
-
-	// implement the write() method called by the monitor for observed DUT inputs;
-	// predict what the DUT results should be for a set of input values
 
 		function void write (my_tx t);
 			my_tx expected_tx;
@@ -65,9 +57,8 @@ class my_scoreboard extends uvm_subscriber #(my_tx);
          {expected_tx.Carry_out,expected_tx.ALU_out} = (t.A == t.B)?8'd1:8'd0; 
         default:{expected_tx.Carry_out,expected_tx.ALU_out} = t.A & t.B; 
 			endcase
-		 // expected_tx.exception = ...
-		//	expected_fifo.put(expected_tx); // save transaction handle
-
+			$display(" T=%0t from the scoreboard ", $time);
+			expected_tx.print();
 	 	if(expected_tx.ALU_out == t.ALU_out) begin
         	$display("[%t0] scoreboard pass! output match ref_item=0x%0h item=0x%0h",$time,expected_tx.ALU_out,t.ALU_out);
 		   if((expected_tx.ALU_sel == 4'b0000)/*for addition*/ || (expected_tx.ALU_sel == 4'b0010)/*for multiplication*/) begin

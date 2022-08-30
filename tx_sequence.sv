@@ -1,7 +1,6 @@
 import uvm_pkg::*;
 import my_test_pkg::*;
 `include "uvm_macros.svh"
-//`include "my_tx.sv"
 
 typedef class my_tx;
 

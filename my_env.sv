@@ -27,7 +27,6 @@ class my_env extends uvm_env;
 	function void connect_phase(uvm_phase phase);
 		agent.dut_inputs_port.connect(scoreboard.analysis_export);
 		agent.dut_inputs_port.connect(coverage.analysis_export);
-		//agent.dut_outputs_port.connect(scoreboard.dut_out_imp_export);
 	endfunction: connect_phase
 
 	task run_phase(uvm_phase phase);

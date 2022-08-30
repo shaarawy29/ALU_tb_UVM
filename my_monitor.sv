@@ -14,17 +14,14 @@ class my_monitor extends uvm_monitor;
 	my_tx tx_in;
 
 	uvm_analysis_port #(my_tx) dut_inputs_port; // analysis port for DUT inputs
-	//uvm_analysis_port #(my_tx) dut_outputs_port; // analysis port for DUT outputs
 
 	function void build_phase(uvm_phase phase);
 		dut_inputs_port = new("dut_inputs_port", this); // construct the analysis port
-		//dut_outputs_port = new("dut_outputs_port", this); // construct the analysis port
 		if (!uvm_config_db #(virtual tb_if)::get(this, "", "DUT_IF", tb_vif))
 `			uvm_fatal("NOVIF", "Failed to get virtual interface from uvm_config_db.\n")
 	endfunction: build_phase
 
 	task run_phase(uvm_phase phase);
-		// monitor DUT inputs synchronous to the interface clock
 		tx_in = my_tx::type_id::create("tx_in");
 		do_monitor();
 endtask: run_phase
@@ -38,6 +35,8 @@ endtask: run_phase
 			tx_in.ALU_sel = tb_vif.ALU_sel;
 			tx_in.ALU_out = tb_vif.ALU_out;
     	tx_in.Carry_out = tb_vif.Carry_out;
+			$display(" T=%0t from the monitor ", $time);
+			tx_in.print();
 			dut_inputs_port.write(tx_in);
 		end
   endtask

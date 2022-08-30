@@ -1,6 +1,5 @@
 import uvm_pkg::*;
 import my_test_pkg::*;
-//`include "my_tx.sv"
 `include "uvm_macros.svh"
 typedef class my_tx;
 class my_driver extends uvm_driver #(my_tx);
@@ -26,6 +25,8 @@ class my_driver extends uvm_driver #(my_tx);
 			tb_vif.A <= tx.A;
 			tb_vif.B <= tx.B;
 			//tb_vif.ALU_sel <= tx.ALU_sel;
+			$display(" T=%0t from the driver ", $time);
+			tx.print();
 			seq_item_port.item_done();
 		end
 	endtask: run_phase
