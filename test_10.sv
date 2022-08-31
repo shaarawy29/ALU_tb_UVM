@@ -1,14 +1,21 @@
 import uvm_pkg::*;
 import my_test_pkg::*;
+`include "uvm_macros.svh"
+class test_10 extends my_test;
 
-module test_10;
+`uvm_component_utils(test_10)
 
- tb_if my_dut_if();
- alu u (my_dut_if.A,my_dut_if.B,my_dut_if.ALU_sel,my_dut_if.ALU_out,my_dut_if.Carry_out);
- initial begin
-	my_dut_if.ALU_sel = 4'ha;
- uvm_config_db #(virtual tb_if)::set(null, "*", "DUT_IF", my_dut_if);
- run_test("my_test");
- end
+function new(string name = "test_10", uvm_component parent = null);
+	super.new(name, parent);
+endfunction
 
-endmodule 
+task run_phase(uvm_phase phase);
+	fork begin
+	super.run_phase(phase);
+	end
+	begin
+		dut_if.ALU_sel = 4'ha;
+	end
+join_any
+endtask
+endclass
